@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.ML.Runtime.Learners;
 using Microsoft.ML.Runtime;
@@ -6,6 +7,8 @@ using Microsoft.ML.Runtime.Data;
 using Microsoft.ML.Core.Data;
 using Microsoft.ML.Runtime.Training;
 using Microsoft.ML;
+using Microsoft.ML.Legacy;
+using Microsoft.ML.Legacy.Models;
 using Microsoft.ML.Legacy.Transforms;
 using Microsoft.ML.Runtime.Api;
 using Microsoft.ML.StaticPipe;
@@ -27,8 +30,10 @@ namespace BinaryClassification_SentimentAnalysis
             var env = new LocalEnvironment();
 
             //2. Create DataReader with data schema mapped to file's columns
-            var reader = TextLoader.CreateReader(env, ctx => (label: ctx.LoadFloat(0),
-                                                              text: ctx.LoadText(1)));
+            var reader = TextLoader.CreateReader(env, ctx => (label: ctx.LoadText(0),
+                                                              text: ctx.LoadText(1)),
+                                                              separator: ',',
+                                                              hasHeader: true);
 
             //3. Create an estimator to use afterwards for creating/traing the model.
             var mctx = new MulticlassClassificationContext(env);
@@ -43,15 +48,16 @@ namespace BinaryClassification_SentimentAnalysis
 
             //Load training data
             var traindata = reader.Read(new MultiFileSource(TrainDataPath));
-            Console.WriteLine("=============== Create and Train the Model ===============");
+            //Console.WriteLine("=============== Create and Train the Model ===============");
             var model = est.Fit(traindata);
-            Console.WriteLine("=============== End of training ===============");
-            Console.WriteLine();
+            //Console.WriteLine("=============== End of training ===============");
+            //Console.WriteLine();
             //5. Evaluate the model
 
             //Load test data
             var testdata = reader.Read(new MultiFileSource(TestDataPath));
             //Console.WriteLine("=============== Evaluating Model's accuracy with Test data===============");
+            //var predictions = model.Transform(testdata);
             var predictions = model.Transform(testdata);
             Console.WriteLine(predictions);
             var metrics = mctx.Evaluate(predictions, row => row.Item1.ToKey(), row => row.Item2);
@@ -104,3 +110,55 @@ namespace BinaryClassification_SentimentAnalysis
         //public float Score { get; set; }
     }
 }
+//public class ModelEvaluator
+//{
+//    private readonly string dataLocation;
+//    private readonly string imagesFolder;
+//    private readonly string modelLocation;
+
+//    public ModelEvaluator(string dataLocation, string imagesFolder, string modelLocation)
+//    {
+//        this.dataLocation = dataLocation;
+//        this.imagesFolder = imagesFolder;
+//        this.modelLocation = modelLocation;
+//    }
+
+//    public async Task Evaluate()
+//    {
+//        // Initialize TensorFlow engine (Needed before loading the ML.NET related to TensorFlow model. This won't be needed when using the new API in v0.6 with Estimators, etc.)
+//        //TensorFlowUtils.Initialize();
+
+//        var model = await PredictionModel.ReadAsync<ImageNetData, ImageNetPrediction>(modelLocation);
+
+//        // Get Predictions
+//        var predictions = GetPredictions(dataLocation, imagesFolder, model).ToArray();
+//        ShowMetrics(dataLocation, model);
+//    }
+
+//    protected IEnumerable<ImageNetPrediction> GetPredictions(string testLocation, string imagesFolder, PredictionModel<ImageNetData, ImageNetPrediction> model)
+//    {
+//        var testData = ImageNetData.ReadFromCsv(testLocation, imagesFolder);
+
+//        foreach (var sample in testData)
+//        {
+//            yield return model.Predict(sample);
+//        }
+//    }
+
+//    protected void ShowMetrics(string testLocation, PredictionModel<ImageNetData, ImageNetPrediction> model)
+//    {
+//        var evaluator = new ClassificationEvaluator();
+//        var testDataSource = new TextLoader(testLocation).CreateFrom<ImageData.ImageNetData>();
+//        ClassificationMetrics metrics = evaluator.Evaluate(model, testDataSource);
+//        PrintMetrics(metrics);
+//    }
+
+//    protected static void PrintMetrics(ClassificationMetrics metrics)
+//    {
+//        Console.WriteLine($"**************************************************************");
+//        Console.WriteLine($"*       Metrics for Image Classification          ");
+//        Console.WriteLine($"*-------------------------------------------------------------");
+//        Console.WriteLine($"*       Log Loss: {metrics.LogLoss:0.##}");
+//        Console.WriteLine($"**************************************************************");
+//    }
+//}
