@@ -33,7 +33,7 @@ namespace BinaryClassification_SentimentAnalysis
             var data = reader.Read(
                 new MultiFileSource(@"C:\Users\timm\Source\Repos\ConsoleApp1\ConsoleApp1\datasets\data.tsv"));
             var learningPipeline = reader.MakeNewEstimator()
-                .Append(r => (Label: r.Label.ToKey(), Features: r.Text.OneHotEncoding()))
+                .Append(r => (Label: r.Label.ToKey(), Features: r.Text.TokenizeText().WordEmbeddings(WordEmbeddingsTransform.PretrainedModelKind.FastTextWikipedia300D)))
                 .Append(r => (
                         Label: r.Label, 
                         Predications: classification.Trainers.Sdca(r.Label, r.Features)));
