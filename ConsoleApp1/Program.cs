@@ -41,8 +41,7 @@ namespace BinaryClassification_SentimentAnalysis
                     s.TextCase = TextNormalizerTransform.CaseNormalizationMode.Lower;
                     s.TextLanguage = TextTransform.Language.Dutch;
                     s.VectorNormalizer = TextTransform.TextNormKind.LInf;
-                }).NormalizeByCumulativeDistribution()))
-                //.Append(r => (Label: r.Label.ToKey(), Features: r.Text.TokenizeText().WordEmbeddings(WordEmbeddingsTransform.PretrainedModelKind.FastTextWikipedia300D)))
+                })))
                 .Append(r => (Label: r.Label, Predications: classification.Trainers.Sdca(r.Label, r.Features)));
 
             var (trainData, testData) = classification.TrainTestSplit(data, testFraction: 0.2);
