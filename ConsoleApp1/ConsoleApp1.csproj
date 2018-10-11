@@ -11,11 +11,22 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.ML" Version="0.6.0" />
-    <PackageReference Include="NTextCat" Version="0.2.1.30" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="datasets\data.tsv">
+    <None Update="datasets\classifications.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="datasets\72.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="datasets\23.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="datasets\61.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="datasets\data.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
